@@ -4,13 +4,21 @@
   <link rel="stylesheet" href="style.css">
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
   <script type="text/javascript" src="https://skyway.io/dist/0.3/peer.js"></script>
+  <link href="https://bootswatch.com/yeti/bootstrap.min.css" rel="stylesheet">
   <script>
+    // to redirect to https * for chrome
+    var loc = window.location.href + '';
+    if (loc.indexOf('http://') == 0) {
+      window.location.href = loc.replace('http://', 'https://');
+    }
+    
+    var start_dt;
 
     // Compatibility shim
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
     // PeerJS object
-    var peer = new Peer({ key: 'a784ffb7-af0a-4fc4-845e-c5be917033de', debug: 3});
+    var peer = new Peer({ key: 'apikeyhere', debug: 3});
 
     peer.on('open', function(){
       $('#my-id').text(peer.id);
@@ -78,6 +86,14 @@
       call.on('stream', function(stream){
         $('#their-video').prop('src', URL.createObjectURL(stream));
       });
+      
+      start_dt = new Date();
+      start_hour = start_dt.getHours();
+      start_min = start_dt.getMinutes();
+      start_sec = start_dt.getSeconds();
+      console.log("START: " + start_hour + " : " + start_min + " : " + start_sec);
+      
+//    var start_time = start_dt.getHours() + ":" + start_dt.getMinutes() + ":" + start_dt.getSeconds();
 
       // UI stuff
       window.existingCall = call;
@@ -85,6 +101,28 @@
       call.on('close', step2);
       $('#step1, #step2').hide();
       $('#step3').show();
+    }
+    
+    // AJAX
+    window.setInterval(function() {
+      $.get("test.php", function() {})
+        .done(function(data) {
+        var receivedData = JSON.parse(data);
+        var current_hour = receivedData["hour"];
+        var current_min = receivedData["min"];
+        var curent_sec = receivedData["sec"];
+        $(".time").text(current_hour + " : " + current_min + " : " + curent_sec);
+        })
+        .fail(function() {
+        });
+    }, 1000);
+    
+    function lengthOfTalk(startH, startM, startS, currentH, currentM, currentS){
+      var hourDif = currentH - startH;
+      if(hourDif < 0){
+        
+      }
+      var minDif = Math.abs()
     }
 
   </script>
@@ -98,7 +136,9 @@
 
       <!-- Video area -->
       <div class="pure-u-2-3" id="video-container">
-        <video id="their-video" autoplay></video>
+        <video id="their-video" autoplay>
+<!--        <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4" />-->
+        </video>
         <video id="my-video" muted="true" autoplay></video>
       </div>
 
@@ -131,9 +171,12 @@
           <p>Currently in call with <span id="their-id">...</span></p>
           <p><a href="#" class="pure-button pure-button-error" id="end-call">End call</a></p>
         </div>
+        
+        <div class="time">
+<!--          <img id="image" width="200" height=" 200">-->
+        </div>  
       </div>
   </div>
-
 
 </body>
 </html>
